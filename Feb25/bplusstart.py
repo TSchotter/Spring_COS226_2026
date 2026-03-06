@@ -141,7 +141,7 @@ class BTree(Tree):
             # create new internal bucket
             self.root = BBucket(self.maxdegree)
             self.root.is_leaf = False
-            # place 0 index of right bucket into new internal bucket
+            # place that saved middle key as the one key of the root
             self.root.keys = [keyToSend]
             # set up links
             self.root.links = [leftBucket, curBucket]
