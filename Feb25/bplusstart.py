@@ -6,12 +6,12 @@ class BBucket(Bucket):
     def add(self, item, leftLink = None):
         if (self.is_leaf):
             # "item" is a DataItem
-            self.leaf_add(item)
+            return self.leaf_add(item)
         else:
             # this will only be called as a result of a split,
             # "item" is an integer, not an entire DataItem
             # leftLink is the link to the new bucket created from split
-            self.internal_add(item, leftLink)
+            return self.internal_add(item, leftLink)
     def leaf_add(self, newItem):
         # find right spot in self.keys, and insert newItem to that spot
 
@@ -22,7 +22,16 @@ class BBucket(Bucket):
         return len(self.keys)
         
     def internal_add(self, key, leftLink):
-        pass
+        # find the correct index in self.keys, where key should go
+
+        # insert key at that index
+        # insert leftLink at that index in the links list.
+
+        return len(self.keys) # send back size of bucket
+    def remove(self, key): # only for leaf buckets
+        # find value, remove it.
+
+        return len(self.keys)
 
 
 # inherit from Tree in visualizer
@@ -106,5 +115,88 @@ class BTree(Tree):
 
     # called when we need to split an internal bucket
     def internal_split(self, curBucket):
-        pass
         
+        # create new left bucket
+        leftBucket = BBucket(self.maxdegree)
+        leftBucket.is_leaf = False
+
+        # find the middle of curBucket
+        middle = self.maxdegree//2 # middle floored
+        # saved key that we're bringing up
+        keyToSend = curBucket.keys[middle] 
+
+        # slice left keys
+        leftBucket.keys = curBucket.keys[:middle] # same as leaf
+        # slice right keys, we don't want the middle anymore
+        curBucket.keys = curBucket.keys[middle+1:]
+
+        # transfer the links
+        leftBucket.links = curBucket.links[:middle+1] # one more link than keys
+        curBucket.links = curBucket.links[middle+1:] # grab remaining links
+
+        # check if we're the root
+        if curBucket.parent == None:
+            # if the bucket has no parent, it's the root
+
+            # create new internal bucket
+            self.root = BBucket(self.maxdegree)
+            self.root.is_leaf = False
+            # place 0 index of right bucket into new internal bucket
+            self.root.keys = [keyToSend]
+            # set up links
+            self.root.links = [leftBucket, curBucket]
+            # set leaf bucket parent properties
+            curBucket.parent = self.root
+            leftBucket.parent = self.root
+        else:
+            # we have a parent (we're not the root)
+            leftBucket.parent = curBucket.parent
+
+            # hand the parent the new key, and the link to the new bucket
+            size = curBucket.parent.add(keyToSend, leftBucket)
+            if size >= self.maxdegree:
+                self.internal_split(curBucket.parent)
+
+    # keytoRemove: integer value that we search for in tree
+    def remove(self, keyToRemove):
+        curBucket = self.root
+
+        # memory var, to keep track if we find it early
+        memory = None
+
+        # we're still an internal bucket, keep search
+        while curBucket.is_leaf == False:
+            # find correct index for links, 
+            # by looking at the keys
+            targetIndex = 0
+            for i in curBucket.keys:
+                if i == keyToRemove:
+                    # remember this spot, 
+                    # we need to replace this with the next largest key
+                    memory = curBucket
+                if i >= keyToRemove:
+                    # we found the path to travel,
+                    # stop looking
+                    break
+                targetIndex += 1
+            # now targetIndex is the correct index
+            curBucket = curBucket.links[targetIndex]
+
+        # curBucket is now at the theoretical spot where keytoRemove is
+
+        # let bucket handle removing
+        size = curBucket.remove(keyToRemove)
+
+        # check if size is too small
+
+        # if we're the root, it can't be too small
+        if curBucket.parent == None:
+            return
+        
+        if size < self.maxdegree/2 -1:
+            # too small
+            # check if steal left is possible
+            # else check if steal right is possible
+            # else check if merge left is possible
+            # merge right as final else
+            pass
