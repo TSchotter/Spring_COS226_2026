@@ -184,6 +184,13 @@ class BTree(Tree):
 
         # curBucket is now at the theoretical spot where keytoRemove is
 
+        # if we found the key as an internal node, fix it
+        if memory:
+            # you do this
+            # find the next highest number in curBucket,
+            # replace the keyToRemove in memory with that number
+            pass
+
         # let bucket handle removing
         size = curBucket.remove(keyToRemove)
 
@@ -194,9 +201,86 @@ class BTree(Tree):
             return
         
         if size < self.maxdegree/2 -1:
-            # too small
+            # too small, as a leaf bucket
             # check if steal left is possible
+            #. example conditions:
+            #.    left bucket needs to exist (.prev variable)
+            #.    needs to be a sibling (same parent)
+            #.    bucket needs to be large enough to steal from
             # else check if steal right is possible
             # else check if merge left is possible
+            #. example conditions:
+            #.    left bucket needs to exist
+            #     needs to be a sibling
             # merge right as final else
             pass
+
+    def leaf_steal_left(self, curBucket):
+        # find where first key value in curBucket is at the parent level,
+        # replace it with the far right key in the left bucket
+        # then steal the far right dataItem from left bucket.
+        pass
+
+    def leaf_steal_right(self, curBucket):
+        # find where first key value in right bucket is at the parent level,
+        # replace it with next key in right bucket.
+        # then steal the first dataItem from right bucket 
+        pass
+
+    def leaf_merge(self, leftBucket, rightBucket):
+        # place everything into leftBucket.
+
+        # search for key of rightBucket and link to rightBucket,
+        #.   in the parent, and pop them.
+
+        # we just removed something from parent,
+        #. check if it's too small.
+
+        #. skip check if parent was the root
+        # but.... if the root size is 0, new merged node becomes root.
+
+        # recommended: figure out what the left and right siblings are
+
+
+        # if it's too small...
+        #       check if we can steal from left
+        #       steal from right
+        #       merge left
+        #       merge right
+        pass
+
+    def internal_steal_left(self, curBucket, leftBucket):
+        # we need to...
+        #. steal last link from leftBucket and insert at start
+        #       of curBucket link
+        #. find key, located at same index value as the link index
+        #       of leftBucket at the parent level.
+        #       insert that value at start of curBucket keys.
+        #. update that parent key to last key of leftBucket.
+        #       (remove that key from leftBucket once done)
+        pass
+
+    def internal_steal_right(self, curBucket, rightBucket):
+        # reverse the rotation.
+        pass
+
+    def internal_merge(self, leftBucket, rightBucket):
+        # to the leftBucket keys...
+        #   append the parent key between the two buckets.
+        #   append all keys from right bucket
+        # to the leftBucket links...
+        #   append all links from right bucket
+        # remove...
+        #   parent key from parent
+        #   link to rightBucket in parent links.
+
+        # go through "if parent too small" checks.
+
+        # if parent is not the root and too small....
+        # 
+        # check if internal steal left is possible
+        # steal right
+        # merge left
+        # merge right
+        pass
+    # general tip: don't forget the parent pointer, make sure it's always correct
