@@ -63,13 +63,37 @@ def merge(x, start, middle, end):
 
 
 def quickSort(x):
-    pass
+    # kicks off recursion process
+    quickSortRecursive(x, 0, len(x)-1)
 
-def naivePartition(x, start, end):
-    # the list is already "partitioned"
-    if end <= start:
+def quickSortRecursive(x, start, end):
+    if (end <= start): 
+        # list is small enough that we know it's in order
         return
 
+    p = lomutoPartition(x, start, end)
+
+    # left half
+    quickSortRecursive(x, start, p-1)
+
+    # right half
+    quickSortRecursive(x, p+1, end)
+
+
+def lomutoPartition(x, start, end):
+    pivot = x[end]
+    i = start # i at the start
+    for j in range(i, end): # j at start, to end-1
+        if x[j] <= pivot: # check if we need to swap
+            x[i], x[j] = x[j], x[i]
+            i += 1 # increase i if we swap
+    # swap i and pivot
+    x[i], x[end] = x[end], x[i]
+
+    return i # return where pivot is
+
+
+def naivePartition(x, start, end):
     pivot = x[end]
     # create empty list that we fill.
     copy = []
@@ -92,13 +116,15 @@ def naivePartition(x, start, end):
     for i in range(len(copy)):
         x[start+i] = copy[i]
 
-    # partition left and right
-    naivePartition(x, start, partitionIndex-1)
-    naivePartition(x, partitionIndex+1, end)
+    # hand relevant info back up
+    return partitionIndex
+
+    # naivePartition(x, start, partitionIndex-1)
+    # naivePartition(x, partitionIndex+1, end)
 
 
 random.seed(0)
-n = 20000
+n = 200000
 
 x = []
 
@@ -107,7 +133,7 @@ for i in range(n):
 
 
 start = time.time()
-mergeSort(x)
-print(x[100:110])
+quickSort(x)
+print(x[100:200])
 end = time.time()
 print(end-start) # number of seconds difference between two
